@@ -11,6 +11,7 @@ Data collection for **A Whole New Route**, an itinerary-optimization project for
 | `data/magic_kingdom_hourly_waits.csv` | Cross-check dataset: hourly averages from Chart the Magic (~152 days, Jun–Oct 2026), transcribed manually from the site's ride pages |
 | `data/DATA_README.md` | Detailed description of both datasets: columns, collection steps, gaps and limitations |
 | `data/walking/` | Walking distances and times between the 12 attractions (OpenStreetMap network, Nov 21, 2026), a Google Maps validation summary and a README |
+| `data/ride_durations.csv` | Duration of each attraction in minutes from TouringPlans, including mandatory pre-shows and exit time (Disney does not publish official ride lengths) |
 
 ## Reproducing the main dataset
 
@@ -38,6 +39,7 @@ Notes:
 - **Wartezeiten.APP**, Magic Kingdom attraction statistics, https://www.wartezeiten.app/en/magickingdompark/ (accessed Nov 10, 2026). The site states that all information is provided without warranty and may be incomplete.
 - **Chart the Magic**, "Best Time to Ride," http://chartthemagic.com/best-time-to-ride (accessed Nov 9, 2026), CC BY 4.0.
 - **OpenStreetMap** pedestrian network (Nov 21, 2026) for walking distances, © OpenStreetMap contributors, ODbL. See `data/walking/README.md`.
+- **TouringPlans**, Magic Kingdom Attraction Durations, https://touringplans.com/magic-kingdom/attractions/duration (accessed Nov 22, 2026).
 
 All values are **posted** standby waits (what Disney displays), not measured time in line.
 
