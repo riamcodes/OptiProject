@@ -23,5 +23,5 @@ python model/run_baseline.py --rides SM TRON PP SDMT HM POTC
 
 ## To do
 
-- **Entrance distances are provisional.** The walking workbook has no entrance row, so `data.py` estimates entrance-to-ride distances as straight-line distance × the median detour factor of the OpenStreetMap matrix (about 1.26), measured from an approximate Town Square point. Replace these with OpenStreetMap network distances.
+- **Entrance distances** come from `a-whole-new-route-data/data/walking/entrance_distances.csv`: OpenStreetMap foot-routing distances (routing.openstreetmap.de, Nov 24, 2026) from the park entrance (28.4163, -81.5812). On ride-to-ride pairs this service matches the team's matrix within a few meters for most pairs and is 10–30% longer for some Adventureland pairs.
 - Step 4: the integer optimization model (time-expanded network) and its LP relaxation. The exact DP in `benchmarks.py` is there to check it.

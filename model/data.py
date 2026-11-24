@@ -55,9 +55,8 @@ COORDS = {
     "BTMR": (28.4197246, -81.5845775), "TIANA": (28.4196285, -81.5849644),
     "POTC": (28.4181032, -81.584234), "JC": (28.4180394, -81.5834779),
 }
-# PROVISIONAL: Town Square, just inside the turnstiles. Replace the entrance row with
-# OpenStreetMap network distances (same method as the walking workbook) when available.
-ENTRANCE_COORD = (28.4166, -81.5812)
+# Park entrance used for the routed entrance distances (walking/entrance_distances.csv)
+ENTRANCE_COORD = (28.4163, -81.5812)
 
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 HOUR_COLS = ["h07", "h08", "h09", "h10", "h11", "h12", "h13", "h14", "h15", "h16",
@@ -87,13 +86,23 @@ def load_walking_distances():
     return dist
 
 
-def add_provisional_entrance(dist):
-    """Estimate entrance distances: straight-line distance x the median detour factor
-    observed between attractions in the OpenStreetMap matrix."""
+def add_entrance(dist):
+    """Entrance-to-ride walking distances.
+
+    Uses walking/entrance_distances.csv: OpenStreetMap foot-routing distances
+    (routing.openstreetmap.de, OSRM, accessed Nov 24, 2026) from the park entrance
+    (28.4163, -81.5812) to each ride's access point. Rides missing from that file fall
+    back to straight-line distance x the median detour factor of the walking matrix.
+    """
     ratios = sorted(dist[a][b] / _haversine_m(COORDS[a], COORDS[b])
                     for a in dist for b in dist if a < b and dist[a][b] > 50)
     detour = ratios[len(ratios) // 2]
-    dist[START] = {c: _haversine_m(ENTRANCE_COORD, COORDS[c]) * detour for c in COORDS}
+    routed = {}
+    path = os.path.join(DATA, "walking", "entrance_distances.csv")
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as fh:
+            routed = {r["ride_code"]: float(r["distance_m"]) for r in csv.DictReader(fh)}
+    dist[START] = {c: routed.get(c, _haversine_m(ENTRANCE_COORD, COORDS[c]) * detour) for c in COORDS}
     dist[START][START] = 0.0
     for c in COORDS:
         dist[c][START] = dist[START][c]
@@ -162,7 +171,7 @@ class Inputs:
 
 def load_inputs(rides=None, walk_speed_kmh=4.5, open_min=9 * 60, close_min=22 * 60):
     dist = load_walking_distances()
-    detour = add_provisional_entrance(dist)
+    detour = add_entrance(dist)
     m_per_min = walk_speed_kmh * 1000 / 60
     walk_min = {a: {b: d / m_per_min for b, d in row.items()} for a, row in dist.items()}
     return Inputs(
@@ -180,7 +189,6 @@ def load_inputs(rides=None, walk_speed_kmh=4.5, open_min=9 * 60, close_min=22 * 
 if __name__ == "__main__":
     inp = load_inputs()
     print(f"Rides: {', '.join(inp.rides)}")
-    print(f"Provisional entrance detour factor: {inp.entrance_detour:.2f}")
     print("Walking from entrance (min):",
           {r: round(inp.walk_min[START][r], 1) for r in inp.rides})
     print("Durations (min):", {r: inp.duration[r] for r in inp.rides})

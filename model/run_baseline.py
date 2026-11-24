@@ -37,7 +37,7 @@ def main():
         results[name] = {y: simulate(inp, order, start, year=y, month=a.month) for y in (2025, 2026)}
 
     print(f"{len(rides)} rides, start {a.start}, month {a.month or 'all-year'}, {a.speed} km/h"
-          " (entrance distances PROVISIONAL)\n")
+          "\n")
     print(f"{'Strategy':<20} {'Year':>5} {'Walk':>6} {'Wait':>6} {'Walk+Wait':>10} {'Total':>7}  Feasible")
     for name, by_year in results.items():
         for y, r in by_year.items():
